@@ -1,0 +1,8 @@
+info
+.env
+deploy.env
+event.json
+.lambda
+.env.test
+test.sh
+node_modules/
