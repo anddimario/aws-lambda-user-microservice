@@ -1,4 +1,4 @@
-const authorize = require('../libs/authorize');
+const authorize = require('../../libs/authorize');
 
 module.exports = (token, cb) => {
   authorize(token, ['user'], (err, user) => {

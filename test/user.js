@@ -9,13 +9,14 @@ AWS.config.update({
 
 const dynamo = new AWS.DynamoDB.DocumentClient();
 const register = require('../services/register');
-const getUser = require('../services/getUser');
+const getUser = require('../services/user/get');
+const editUser = require('../services/user/edit');
 const login = require('../services/login');
 
 const user = {
   email: 'test@example.com',
   password: 'testpw1',
-  name: 'Test User'
+  fullname: 'Test User'
 };
 
 describe('User', function () {
@@ -85,6 +86,16 @@ describe('User', function () {
 
   it('should get user', (done) => {
     getUser(this.token, (err, user) => {
+      if (err) return done(err);
+      return done();
+    });
+
+  });
+
+  it('should edit user', (done) => {
+    editUser({
+      fullname: 'Edited'
+    }, this.token, (err, user) => {
       if (err) return done(err);
       return done();
     });

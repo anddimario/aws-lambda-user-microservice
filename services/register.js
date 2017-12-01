@@ -38,7 +38,7 @@ module.exports = (body, cb) => {
   const validators = {
     email: joi.string().email({ minDomainAtoms: 2 }).required(), // need minDomainAtoms to avoid local hostname and include tld
     password: joi.string().required(),
-    name: joi.string().required(),
+    fullname: joi.string().required(),
   };
   const schema = joi.object().keys(validators);
   const validation = joi.validate(body, schema);
@@ -48,7 +48,7 @@ module.exports = (body, cb) => {
 
   const user = {
     email: body.email,
-    name: body.name,
+    fullname: body.fullname,
     role: 'user'
   };
   computeHash(body.password, function (err, salt, hash) {

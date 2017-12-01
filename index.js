@@ -3,7 +3,8 @@
 console.log('Loading microservice - user');
 
 const register = require('./services/register');
-const getUser = require('./services/getUser');
+const getUser = require('./services/user/get');
+const editUser = require('./services/user/edit');
 const login = require('./services/login');
 
 exports.handler = (event, context, callback) => {
@@ -49,6 +50,8 @@ exports.handler = (event, context, callback) => {
       register(body, done);
     } else if (type === 'login') {
       login(body, done);
+    } else if (type === 'editUser') {
+      editUser(body, event.headers.Authorization, done);
     } else {
       done(new Error(`Unsupported method "${event.httpMethod}"`));
     }
