@@ -1,14 +1,21 @@
 'use strict';
 
 const authorize = require('../../libs/authorize');
+const dynamo = require('../../libs/dynamo');
 
 module.exports = (token, cb) => {
   authorize(token, ['user'], (err, user) => {
     if (err) {
       return cb(err);
     } else {
-      // return the same authorized user
-      return cb(null, user);
+      dynamo.delete(user.email, (err) => {
+        if (err) {
+          return cb(err);
+        } else {
+          return cb(null, 'done');
+        }
+
+      });
     }
   });
 

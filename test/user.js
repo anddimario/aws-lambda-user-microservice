@@ -1,16 +1,10 @@
 'use strict';
 
-const AWS = require('aws-sdk');
-
-AWS.config.update({
-  endpoint: process.env.DYNAMO_ENDPOINT,
-  region: process.env.DYNAMO_REGION
-});
-
-const dynamo = new AWS.DynamoDB.DocumentClient();
 const register = require('../services/register');
 const getUser = require('../services/user/get');
+const removeUser = require('../services/user/remove');
 const editUser = require('../services/user/edit');
+const editPassword = require('../services/user/editPassword');
 const login = require('../services/login');
 
 const user = {
@@ -27,7 +21,6 @@ describe('User', function () {
       if (err) return done(err);
       return done();
     });
-
   });
 
   it('should not register the same', (done) => {
@@ -35,7 +28,6 @@ describe('User', function () {
       if (err) return done();
       return done(new Error('registredTheSame'));
     });
-
   });
 
 
@@ -48,7 +40,6 @@ describe('User', function () {
       if (err) return done(err);
       return done();
     });
-
   });
 
   it('should not login - wrong user', (done) => {
@@ -59,7 +50,6 @@ describe('User', function () {
       if (err) return done();
       return done(new Error('loggedWithWrongUser'));
     });
-
   });
 
   it('should not login - wrong user', (done) => {
@@ -70,7 +60,6 @@ describe('User', function () {
       if (err) return done();
       return done(new Error('loggedWithWrongUser'));
     });
-
   });
 
   it('should not login - wrong password', (done) => {
@@ -81,7 +70,6 @@ describe('User', function () {
       if (err) return done();
       return done(new Error('loggedWithWrongPassword'));
     });
-
   });
 
   it('should get user', (done) => {
@@ -89,7 +77,6 @@ describe('User', function () {
       if (err) return done(err);
       return done();
     });
-
   });
 
   it('should edit user', (done) => {
@@ -99,16 +86,22 @@ describe('User', function () {
       if (err) return done(err);
       return done();
     });
-
   });
 
-  after((done) => {
-    return dynamo.delete({
-      TableName: 'users',
-      Key: {
-        email: 'test@example.com'
-      }
-    }, done);
+  it('should edit user password', (done) => {
+    editPassword({
+      password: 'newtestpw1'
+    }, this.token, (err, user) => {
+      if (err) return done(err);
+      return done();
+    });
+  });
+
+  it('should remove user', (done) => {
+    removeUser(this.token, (err) => {
+      if (err) return done(err);
+      return done();
+    });
   });
 
 });

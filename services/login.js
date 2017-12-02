@@ -1,18 +1,11 @@
 'use strict';
 
-const AWS = require('aws-sdk');
 const crypto = require('crypto');
 const joi = require('joi');
 const jwt = require('jsonwebtoken');
+const dynamo = require('../libs/dynamo');
 
-AWS.config.update({
-  endpoint: process.env.DYNAMO_ENDPOINT,
-  region: process.env.DYNAMO_REGION
-});
-
-const dynamo = new AWS.DynamoDB.DocumentClient();
-
-function computeHash(password, salt, cb) {
+function computepassword(password, salt, cb) {
   // Bytesize
   const len = 128;
   const iterations = 4096;
@@ -20,13 +13,6 @@ function computeHash(password, salt, cb) {
     if (err) return cb(err);
     cb(null, salt, derivedKey.toString('base64'));
   });
-}
-
-function getUser(email, cb) {
-  dynamo.get({
-    TableName: 'users',
-    Key: { email: email },
-  }, cb);
 }
 
 module.exports = (body, cb) => {
@@ -41,18 +27,18 @@ module.exports = (body, cb) => {
     return cb(new Error(validation.error.details));
   }
 
-  getUser(body.email, function (err, user) {
+  dynamo.get(body.email, function (err, user) {
     if (err) {
       return cb(err);
     } else {
       if (!user.Item) {
         return cb(new Error('notFound'));
       } else {
-        computeHash(body.password, user.Item.salt, function (err, salt, hash) {
+        computepassword(body.password, user.Item.salt, function (err, salt, password) {
           if (err) {
             return cb(err);
           } else {
-            if (hash === user.Item.hash) {
+            if (password === user.Item.password) {
               const token = jwt.sign({ user: user.Item.email }, process.env.JWT_SECRET, { expiresIn: '2d' });
               return cb(null, { token });
             } else {

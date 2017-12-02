@@ -2,12 +2,13 @@
 
 const authorize = require('../../libs/authorize');
 const joi = require('joi');
+const createPassword = require('../../libs/createPassword');
 const dynamo = require('../../libs/dynamo');
 
 module.exports = (body, token, cb) => {
   // validation
   const validators = {
-    fullname: joi.string().required(),
+    password: joi.string().required(),
   };
   const schema = joi.object().keys(validators);
   const validation = joi.validate(body, schema);
@@ -18,17 +19,24 @@ module.exports = (body, token, cb) => {
     if (err) {
       return cb(err);
     } else {
-      const set = 'SET fullname = :fullname';
-      const value = {
-        ':fullname': body.fullname
-      };
-      dynamo.update(user.email, set, value, (err) => {
+
+      createPassword(body.password, function (err, salt, password) {
         if (err) {
           return cb(err);
         } else {
-          return cb(null, 'done');
+          const set = 'SET password = :password, salt = :salt';
+          const value = {
+            ':password': password,
+            ':salt': salt
+          };
+          dynamo.update(user.email, set, value, (err) => {
+            if (err) {
+              return cb(err);
+            } else {
+              return cb(null, 'done');
+            }
+          });
         }
-
       });
     }
   });

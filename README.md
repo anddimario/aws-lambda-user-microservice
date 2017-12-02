@@ -1,11 +1,13 @@
 aws lambda microservice for user manager    
 **Status**: early alpha
 
+### Features
+- login/registration
+- user: get profile, edit profile, edit password, remove
+
 ### Todo
-- user: edit, remove
 - admin: add, list, get, edit and remove
-- online tests with API Gateway
-- improve readme
+- improvements
 
 ### Usage
 - install aws-cli
@@ -13,7 +15,7 @@ aws lambda microservice for user manager
 - npm install aws-sdk joi jsonwebtoken
 - install dynamodb local (for local tests) http://docs.aws.amazon.com/amazondynamodb/latest/developerguide/DynamoDBLocal.html
 - run: 
-  ```aws dynamodb create-table --endpoint-url http://localhost:8000 --attribute-definitions AttributeName=email,AttributeType=S --key-schema AttributeName=email,KeyType=HASH --table-name users  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5```
+  ```aws dynamodb create-table --endpoint-url http://localhost:8000 --attribute-definitions AttributeName=email,AttributeType=S --key-schema AttributeName=email,KeyType=password --table-name users  --provisioned-throughput ReadCapacityUnits=5,WriteCapacityUnits=5```
 
 ### Required env variables
 DYNAMO_REGION,DYNAMO_ENDPOINT,JWT_SECRET
@@ -34,6 +36,20 @@ Login body example (POST):
   type: 'login',
   email: 'test@example.com',
   password: 'testpw1',
+}
+```
+Edit user body example (POST - Token required):
+```
+{
+  type: 'editUser',
+  fullname: 'New user',
+}
+```
+Edit password body example (POST - Token required):
+```
+{
+  type: 'editPassword',
+  password: 'password',
 }
 ```
 

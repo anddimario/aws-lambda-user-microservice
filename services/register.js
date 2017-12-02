@@ -1,38 +1,8 @@
 'use strict';
 
-const AWS = require('aws-sdk');
-const crypto = require('crypto');
 const joi = require('joi');
-
-AWS.config.update({
-  endpoint: process.env.DYNAMO_ENDPOINT,
-  region: process.env.DYNAMO_REGION
-});
-
-const dynamo = new AWS.DynamoDB.DocumentClient();
-
-function computeHash(password, cb) {
-  // Bytesize
-  const len = 128;
-  const iterations = 4096;
-  crypto.randomBytes(len, function (err, salt) {
-    if (err) return cb(err);
-    salt = salt.toString('base64');
-    
-    crypto.pbkdf2(password, salt, iterations, len, 'sha512', function (err, derivedKey) {
-      if (err) return cb(err);
-      cb(null, salt, derivedKey.toString('base64'));
-    });
-  });
-}
-
-function storeUser(user, cb) {
-  dynamo.put({
-    TableName: 'users',
-    Item: user,
-    ConditionExpression: 'attribute_not_exists (email)'
-  }, cb);
-}
+const createPassword = require('../libs/createPassword');
+const dynamo = require('../libs/dynamo');
 
 module.exports = (body, cb) => {
   const validators = {
@@ -51,13 +21,13 @@ module.exports = (body, cb) => {
     fullname: body.fullname,
     role: 'user'
   };
-  computeHash(body.password, function (err, salt, hash) {
+  createPassword(body.password, function (err, salt, password) {
     if (err) {
       return cb(err);
     } else {
-      user.hash = hash;
+      user.password = password;
       user.salt = salt;
-      storeUser(user, function (err) {
+      dynamo.put(user, function (err) {
         if (err) {
           if (err.code === 'ConditionalCheckFailedException') {
             return cb(new Error('alreadyExists'));
