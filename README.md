@@ -54,7 +54,8 @@ Edit password body example (POST - Token required):
 ```
 
 ### Run locally
-Create an event json, for example regEvent.json for registration:
+Use: https://github.com/anddimario/lambda-serve    
+Or create an event json, for example regEvent.json for registration:
 ```
 {
   "body": "{\"email\":\"test@example.com\",\"password\":\"testpw1\",\"fullname\":\"Test User\",\"type\":\"register\"}",

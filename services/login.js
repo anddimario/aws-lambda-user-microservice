@@ -24,7 +24,7 @@ module.exports = (body, cb) => {
   const schema = joi.object().keys(validators);
   const validation = joi.validate(body, schema);
   if (validation.error) {
-    return cb(new Error(validation.error.details));
+    return cb(new Error(JSON.stringify(validation.error.details)));
   }
 
   dynamo.get(body.email, function (err, user) {

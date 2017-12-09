@@ -6,3 +6,4 @@ event.json
 .env.test
 test.sh
 node_modules/
+testEvent.json
