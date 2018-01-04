@@ -52,6 +52,13 @@ Edit password body example (POST - Token required):
   password: 'password',
 }
 ```
+Admin, get user querystring example (GET - Token required):
+```
+{
+  type: 'getUserAdmin',
+  email: 'test@example.com',
+}
+```
 
 ### Run locally
 Use: https://github.com/anddimario/lambda-serve    
